@@ -1,0 +1,34 @@
+{
+  "name": "@dkh-dev/crypto",
+  "version": "1.0.0",
+  "description": "A wrapper for some `crypto` Node.js APIs",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "node test",
+    "prepublishOnly": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/dkh-dev/crypto.git"
+  },
+  "keywords": [
+    "crypto",
+    "hash",
+    "sha",
+    "sha256",
+    "aes",
+    "aes256"
+  ],
+  "author": "Hoang <dangkyokhoang@gmail.com> (https://dangkyokhoang.github.io/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dkh-dev/crypto/issues"
+  },
+  "homepage": "https://github.com/dkh-dev/crypto#readme",
+  "devDependencies": {
+    "tape": "^4.11.0"
+  }
+}
