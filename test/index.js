@@ -10,6 +10,16 @@ const secret = 'secret'
 
 const base64 = { encoding: 'base64' }
 
+test('Random bytes', async t => {
+    const buffer = await crypto.randomBytes(10)
+    const string = await crypto.randomBytes(10, { encoding: 'hex' })
+
+    t.equal(buffer.length, 10)
+    t.equal(typeof string, 'string')
+
+    t.end()
+})
+
 test('SHA-256', t => {
     t.equal(crypto.sha256(data), `3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7`)
 
@@ -25,7 +35,7 @@ test('HMAC', t => {
 
 test('AES-256', async t => {
     const encrypted = await crypto.aes256.encrypt(data, secret, base64)
-    const decrypted = await crypto.aes256.decypt(encrypted, secret, base64)
+    const decrypted = await crypto.aes256.decrypt(encrypted, secret, base64)
 
     t.equal(decrypted, data)
 

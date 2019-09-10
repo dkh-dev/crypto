@@ -10,6 +10,23 @@ $ yarn add @dkh-dev/crypto
 
 ## Examples
 
+### Random bytes
+
+```javascript
+'use strict'
+
+const { randomBytes } = require('@dkh-dev/crypto')
+
+const main = async () => {
+    console.log(await randomBytes(3))
+    console.log(await randomBytes(3, { encoding: 'hex' }))
+    // => <Buffer 86 70 d6>
+    //    731c05
+}
+
+main()
+```
+
 ### SHA-256
 
 ```javascript
@@ -45,7 +62,7 @@ const encoding = 'base64'
 
 const main = async () => {
     const encrypted = await aes256.encrypt(data, password, { encoding })
-    const decrypted = await aes256.decypt(encrypted, password, { encoding })
+    const decrypted = await aes256.decrypt(encrypted, password, { encoding })
 
     console.log(encrypted)
     console.log(decrypted === data)

@@ -2,6 +2,30 @@
 
 const crypto = require('crypto')
 
+const promisify = func => (...args) => new Promise((resolve, reject) => {
+    func(...args, (error, value) => {
+        if (error) {
+            reject(error)
+        } else {
+            resolve(value)
+        }
+    })
+})
+
+const internalRandomBytes = promisify(crypto.randomBytes)
+
+/**
+ * @param {int} size
+ * @returns {Promise<(string|Buffer)>}
+ */
+const randomBytes = async (size, options = {}) => {
+    const { encoding } = options
+
+    const buffer = await internalRandomBytes(size)
+
+    return encoding ? buffer.toString(encoding) : buffer
+}
+
 const sha256 = (data, options = {}) => {
     const { encoding = 'hex' } = options
 
@@ -22,23 +46,15 @@ const hmac = {
     },
 }
 
-const scrypt = (password, salt, keylen) => new Promise((resolve, reject) => {
-    crypto.scrypt(password, salt, keylen, (error, key) => {
-        if (error) {
-            reject(error)
-        } else {
-            resolve(key)
-        }
-    })
-})
+const scrypt = promisify(crypto.scrypt)
 
 const aes256 = {
     async encrypt(data, password, options = {}) {
         const { encoding = 'hex' } = options
 
-        const salt = crypto.randomBytes(16)
+        const salt = await randomBytes(16)
         const key = scrypt(password, salt, 32)
-        const iv = crypto.randomBytes(16)
+        const iv = await randomBytes(16)
         const cipher = crypto.createCipheriv('aes-256-gcm', await key, iv)
 
         const encrypted = Buffer.concat([
@@ -51,7 +67,7 @@ const aes256 = {
         return Buffer.concat([ salt, iv, tag, encrypted ]).toString(encoding)
     },
 
-    async decypt(data, password, options = {}) {
+    async decrypt(data, password, options = {}) {
         const { encoding = 'hex' } = options
 
         const buffer = Buffer.from(data, encoding)
@@ -70,6 +86,7 @@ const aes256 = {
 }
 
 module.exports = {
+    randomBytes,
     sha256,
     hmac,
     scrypt,
