@@ -12,65 +12,74 @@ const promisify = func => (...args) => new Promise((resolve, reject) => {
     })
 })
 
-const internalRandomBytes = promisify(crypto.randomBytes)
+const randomBytes = promisify(crypto.randomBytes)
 
-/**
- * @param {int} size
- * @returns {Promise<(string|Buffer)>}
- */
-const randomBytes = async (size, options = {}) => {
-    const { encoding } = options
-
-    const buffer = await internalRandomBytes(size)
-
-    return encoding ? buffer.toString(encoding) : buffer
-}
-
-const sha256 = (data, options = {}) => {
-    const { encoding = 'hex' } = options
-
-    return crypto
-        .createHash('sha256')
-        .update(data)
-        .digest(encoding)
-}
+const sha256 = data => crypto
+    .createHash('sha256')
+    .update(data)
+    .digest()
 
 const hmac = {
-    sha256(data, secret, options = {}) {
-        const { encoding = 'hex' } = options
-
+    sha256(data, key) {
         return crypto
-            .createHmac('sha256', secret)
+            .createHmac('sha256', key)
             .update(data)
-            .digest(encoding)
+            .digest()
     },
 }
 
 const scrypt = promisify(crypto.scrypt)
 
-const aes256 = {
-    async encrypt(data, password, options = {}) {
-        const { encoding = 'hex' } = options
+scrypt.hashiv = async (data, password, iv) => {
+    const N = iv.readUInt8(0) ** 2
+    const r = iv.readUInt8(1)
+    const p = iv.readUInt8(2)
 
+    const key = await scrypt(password, iv, 32, { N, r, p, maxmem: 256 * N * r })
+
+    return Buffer.concat([ iv, hmac.sha256(data, key) ])
+}
+
+scrypt.hash = async (data, password, options = {}) => {
+    const { N = 16384, r = 8, p = 1 } = options
+
+    const iv = Buffer.alloc(35)
+    const salt = await randomBytes(32)
+
+    iv.writeUInt8(N ** (1 / 2))
+    iv.writeUInt8(r, 1)
+    iv.writeUInt8(p, 2)
+    salt.copy(iv, 3)
+
+    return scrypt.hashiv(data, password, iv)
+}
+
+scrypt.verify = async (data, password, hash) => {
+    const buffer = Buffer.from(hash, 'base64')
+    const iv = buffer.slice(0, 35)
+
+    return buffer.equals(await scrypt.hashiv(data, password, iv))
+}
+
+const aes256 = {
+    async encrypt(data, password) {
         const salt = await randomBytes(16)
         const key = scrypt(password, salt, 32)
         const iv = await randomBytes(16)
         const cipher = crypto.createCipheriv('aes-256-gcm', await key, iv)
 
         const encrypted = Buffer.concat([
-            cipher.update(data, 'utf8'),
+            cipher.update(data),
             cipher.final(),
         ])
 
         const tag = cipher.getAuthTag()
 
-        return Buffer.concat([ salt, iv, tag, encrypted ]).toString(encoding)
+        return Buffer.concat([ salt, iv, tag, encrypted ])
     },
 
-    async decrypt(data, password, options = {}) {
-        const { encoding = 'hex' } = options
-
-        const buffer = Buffer.from(data, encoding)
+    async decrypt(data, password) {
+        const buffer = Buffer.from(data, 'base64')
         const salt = buffer.slice(0, 16)
         const key = scrypt(password, salt, 32)
         const iv = buffer.slice(16, 32)
@@ -80,8 +89,10 @@ const aes256 = {
 
         decipher.setAuthTag(tag)
 
-        return decipher.update(encrypted, 'binary', 'utf8')
-            + decipher.final('utf8')
+        return Buffer.concat([
+            decipher.update(encrypted, 'binary'),
+            decipher.final(),
+        ])
     },
 }
 
