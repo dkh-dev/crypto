@@ -1,6 +1,6 @@
 # crypto
 
-_A wrapper for some `crypto` Node.js APIs_
+_A crypto library that is secure, easy to use and hard to misuse_
 
 ## Installation
 
@@ -18,15 +18,15 @@ $ yarn add @dkh-dev/crypto
 const { scrypt } = require('@dkh-dev/crypto')
 
 const main = async () => {
-    const data = 'data'
-    const password = 'password'
+  const data = 'data'
+  const password = 'password'
 
-    const hash = await scrypt.hash(data, password)
+  const hash = await scrypt.hash(data, password)
 
-    console.log(hash.toString('base64'))
-    console.log(await scrypt.verify(data, password, hash))
-    // => gAgBZabgVkvU18jyc9sdorjPxZIPPFlHlZcg7NCkdDDtdjDGXn5dKWtezrVLs8rxvNsFR6eNadoFUZ8Gr5ElkhKvbg==
-    //    true
+  console.log(hash.toString('base64'))
+  console.log(await scrypt.verify(data, password, hash))
+  // => DggBZexpdHVfTclOZY+wiL5DN24ceOFgs2BX3e48CKU/MMKvVUb0MSV3+vGR7zHBtU3hx3f+ryFcgGHqY8GH0r4z6Q==
+  //    true
 }
 
 main()
@@ -43,38 +43,50 @@ const data = 'data'
 const password = 'secret'
 
 const main = async () => {
-    const encrypted = await aes256.encrypt(data, password)
-    const decrypted = await aes256.decrypt(encrypted, password)
+  const encrypted = await aes256.encrypt(data, password)
+  const decrypted = await aes256.decrypt(encrypted, password)
 
-    console.log(encrypted.toString('base64'))
-    console.log(decrypted.toString('utf8') === data)
-    // => rPxoDwiL0k742Wm2Pjeo8If0D7whePe8+4TooST9qN+n2NiPmqFvWhnvPurgKU6yF1bfcg==
-    //    true
+  console.log(encrypted.toString('base64'))
+  console.log(decrypted.toString('utf8') === data)
+  // => qR1XbghwPYq+iR6rxXdygeZ7mhWYQbWr2rEIr5R9WYJQMU2rAtz95J3OhJAunkmeDex9RA==
+  //    true
 }
 
 main()
 ```
 
-### HMAC
+### HMAC-SHA256
 
 ```javascript
 'use strict'
 
 const { hmac } = require('@dkh-dev/crypto')
 
-console.log(hmac.sha256('data', 'secret').toString('base64'))
-// => GywWt1vSqHDBFBU8zaW8/KYzFLxyL6Fg1pDeEzzLuds=
+const main = async () => {
+  const buffer = await hmac.sha256('data', 'secret')
+
+  console.log(buffer.toString('base64'))
+  // => GywWt1vSqHDBFBU8zaW8/KYzFLxyL6Fg1pDeEzzLuds=
+}
+
+main()
 ```
 
-### SHA-256
+### SHA256
 
 ```javascript
 'use strict'
 
-const { sha256 } = require('@dkh-dev/crypto')
+const { hash } = require('@dkh-dev/crypto')
 
-console.log(sha256('data').toString('hex'))
-// => 3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7
+const main = async () => {
+  const buffer = await hash.sha256('data', 'secret')
+
+  console.log(buffer.toString('base64'))
+  // => Om6weQ85rIfJTzhWst0sXREOaBFgImGpqSPTuyOtyLc=
+}
+
+main()
 ```
 
 ### Random bytes
@@ -85,8 +97,8 @@ console.log(sha256('data').toString('hex'))
 const { randomBytes } = require('@dkh-dev/crypto')
 
 const main = async () => {
-    console.log(await randomBytes(3))
-    // => <Buffer 86 70 d6>
+  console.log(await randomBytes(3))
+  // => <Buffer 86 70 d6>
 }
 
 main()

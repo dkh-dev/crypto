@@ -1,0 +1,9 @@
+{
+  "extends": "@dkh-dev/eslint-config",
+  "rules": {
+    "max-params": [
+      "error",
+      4
+    ]
+  }
+}

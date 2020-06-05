@@ -1,7 +1,7 @@
 {
   "name": "@dkh-dev/crypto",
-  "version": "2.0.0",
-  "description": "A wrapper for some `crypto` Node.js APIs",
+  "version": "3.0.0",
+  "description": "A crypto library that is secure, easy to use and hard to misuse",
   "main": "index.js",
   "files": [
     "index.js"
@@ -9,6 +9,10 @@
   "scripts": {
     "test": "node test",
     "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "@dkh-dev/eslint-config": "^1.5.0",
+    "tape": "^4.11.0"
   },
   "repository": {
     "type": "git",
@@ -31,8 +35,5 @@
   "bugs": {
     "url": "https://github.com/dkh-dev/crypto/issues"
   },
-  "homepage": "https://github.com/dkh-dev/crypto#readme",
-  "devDependencies": {
-    "tape": "^4.11.0"
-  }
+  "homepage": "https://github.com/dkh-dev/crypto#readme"
 }
