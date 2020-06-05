@@ -21,10 +21,10 @@ const main = async () => {
   const data = 'data'
   const password = 'password'
 
-  const hash = await scrypt.hash(data, password)
+  const hash = await scrypt.hash(password, data)
 
   console.log(hash.toString('base64'))
-  console.log(await scrypt.verify(data, password, hash))
+  console.log(await scrypt.verify(password, data, hash))
   // => DggBZexpdHVfTclOZY+wiL5DN24ceOFgs2BX3e48CKU/MMKvVUb0MSV3+vGR7zHBtU3hx3f+ryFcgGHqY8GH0r4z6Q==
   //    true
 }
@@ -43,8 +43,8 @@ const data = 'data'
 const password = 'secret'
 
 const main = async () => {
-  const encrypted = await aes256.encrypt(data, password)
-  const decrypted = await aes256.decrypt(encrypted, password)
+  const encrypted = await aes256.encrypt(password, data)
+  const decrypted = await aes256.decrypt(password, encrypted)
 
   console.log(encrypted.toString('base64'))
   console.log(decrypted.toString('utf8') === data)
@@ -62,8 +62,11 @@ main()
 
 const { hmac } = require('@dkh-dev/crypto')
 
+const data = 'data'
+const key = 'secret'
+
 const main = async () => {
-  const buffer = await hmac.sha256('data', 'secret')
+  const buffer = await hmac.sha256(key, data)
 
   console.log(buffer.toString('base64'))
   // => GywWt1vSqHDBFBU8zaW8/KYzFLxyL6Fg1pDeEzzLuds=
@@ -79,8 +82,11 @@ main()
 
 const { hash } = require('@dkh-dev/crypto')
 
+const data = 'data'
+const key = 'secret'
+
 const main = async () => {
-  const buffer = await hash.sha256('data', 'secret')
+  const buffer = await hash.sha256(key, data)
 
   console.log(buffer.toString('base64'))
   // => Om6weQ85rIfJTzhWst0sXREOaBFgImGpqSPTuyOtyLc=
