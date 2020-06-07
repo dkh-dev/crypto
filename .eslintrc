@@ -4,6 +4,8 @@
     "max-params": [
       "error",
       4
-    ]
+    ],
+    "no-bitwise": "off",
+    "no-cond-assign": "off"
   }
 }

@@ -1,6 +1,6 @@
 # crypto
 
-_A crypto library that is secure, easy to use and hard to misuse_
+_A crypto library that is easy to use and hard to misuse_
 
 ## Installation
 
