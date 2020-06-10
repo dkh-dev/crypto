@@ -122,7 +122,7 @@ test('scrypt.scryptiv', async t => {
   const ivSize = { logN: 2, r: 4, p: 4 }
   const saltSize = 64
 
-  const iv = scrypt.derivedIv({ N: 2 ** 11, r: 15, p: 3 }, ivSize)
+  const iv = scrypt.deriveIv({ N: 2 ** 11, r: 15, p: 3 }, ivSize)
   const salt = await randomBytes(saltSize)
   const buffer = await scrypt.scryptiv(PASSWORD, iv, salt, DATA)
 

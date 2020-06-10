@@ -1,6 +1,6 @@
 {
   "name": "@dkh-dev/crypto",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "A crypto library that is easy to use and hard to misuse",
   "main": "index.js",
   "files": [
@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@dkh-dev/eslint-config": "^1.5.0",
-    "tape": "^4.11.0"
+    "tape": "^5.0.1"
   },
   "repository": {
     "type": "git",
