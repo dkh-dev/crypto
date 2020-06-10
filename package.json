@@ -1,10 +1,11 @@
 {
   "name": "@dkh-dev/crypto",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "A crypto library that is easy to use and hard to misuse",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "lib/"
   ],
   "scripts": {
     "test": "node test",
