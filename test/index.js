@@ -16,8 +16,8 @@ const LARGE_DATA = '0123456789'.repeat(1e6)
 const LARGE_PASSWORD = '9876543210'.repeat(1e6)
 const INVALID_DATA = DATA.toUpperCase()
 const INVALID_PASSWORD = PASSWORD.toUpperCase()
-const AAD = Buffer.from('aad')
-const INVALID_AAD = Buffer.from('invalid-aad')
+const AAD = 'aad'
+const INVALID_AAD = 'invalid-aad'
 
 
 test('box', async t => {
@@ -26,6 +26,8 @@ test('box', async t => {
 
   const encrypted = await box.seal(publicKey, DATA)
   const decrypted = await box.open(privateKey, encrypted)
+
+  t.plan(6)
 
   t.is(decrypted.toString(), DATA, 'public encrypt private decrypt')
 
@@ -53,13 +55,13 @@ test('box', async t => {
 
     t.rejects(box.open(privateKey, encrypted, INVALID_AAD), 'invalid box aad')
   }
-
-  t.end()
 })
 
 test('aes256', async t => {
   const encrypted = await aes256.encrypt(PASSWORD, DATA)
   const decrypted = await aes256.decrypt(PASSWORD, encrypted)
+
+  t.plan(9)
 
   t.is(decrypted.toString(), DATA, 'the decrypted string equals to the input data')
 
@@ -84,12 +86,12 @@ test('aes256', async t => {
 
     t.rejects(aes256.decrypt(PASSWORD, encrypted, INVALID_AAD), 'invalid aad')
   }
-
-  t.end()
 })
 
 test('scrypt.hash', async t => {
   const buffer = await scrypt.hash(PASSWORD, DATA)
+
+  t.plan(11)
 
   t.is(await scrypt.verify(PASSWORD, DATA, buffer), true, 'authenticated data')
   t.is(await scrypt.verify(PASSWORD, INVALID_DATA, buffer), false, 'invalid data')
@@ -114,47 +116,47 @@ test('scrypt.hash', async t => {
 
     t.is(await scrypt.verify(PASSWORD, DATA, buffer), true, 'user-defined scrypt options')
   }
-
-  t.end()
 })
 
-test('scrypt.scryptiv', async t => {
+test('scrypt.hashiv', async t => {
   const ivSize = { logN: 2, r: 4, p: 4 }
   const saltSize = 64
 
-  const iv = scrypt.deriveIv({ N: 2 ** 11, r: 15, p: 3 }, ivSize)
+  const iv = scrypt.subtle.deriveIv({ N: 2 ** 11, r: 15, p: 3 }, ivSize)
   const salt = await randomBytes(saltSize)
-  const buffer = await scrypt.scryptiv(PASSWORD, iv, salt, DATA)
+  const buffer = await scrypt.subtle.hashiv(PASSWORD, iv, salt, DATA)
+
+  t.plan(1)
 
   t.is(await scrypt.verify(PASSWORD, DATA, buffer), true, 'a hash should include sufficient information for verification')
-
-  t.end()
 })
 
-test('scrypt.scrypt', async t => {
-  const key = await scrypt.scrypt(DATA, PASSWORD, 32)
-  const same = await scrypt.scrypt(DATA, PASSWORD, 32)
-  const different = await scrypt.scrypt(DATA, PASSWORD, 32, { N: 4 })
+test('scrypt.derive', async t => {
+  const key = await scrypt.subtle.derive(DATA, PASSWORD, 32)
+  const same = await scrypt.subtle.derive(DATA, PASSWORD, 32)
+  const different = await scrypt.subtle.derive(DATA, PASSWORD, 32, { N: 4 })
+
+  t.plan(3)
 
   t.is(key.length, 32, 'scrypt derived key size equals to the defined size')
   t.is(key, same, 'same input produces same hash')
   t.not(key, different, 'different input')
-
-  t.end()
 })
 
 test('randomBytes', async t => {
   const buffer = await randomBytes(10)
 
+  t.plan(2)
+
   t.is(buffer.length, 10, 'buffer size equals to the specified size')
 
   t.rejects(randomBytes('invalid'), 'size must be of type number')
-
-  t.end()
 })
 
 test('hash.sha256', async t => {
   const buffer = await hash.sha256(DATA)
+
+  t.plan(5)
 
   t.is(buffer.length * 8, 256, 'sha256 hash size is 256 bits')
   t.is(buffer.toString('base64'), SHA256_HASH, 'same hash')
@@ -163,12 +165,12 @@ test('hash.sha256', async t => {
   t.not(await hash.sha256(INVALID_DATA), buffer, 'invalid data')
 
   t.resolves(hash.sha256(LARGE_DATA), 'hash large data')
-
-  t.end()
 })
 
 test('hmac.sha256', async t => {
   const buffer = await hmac.sha256(PASSWORD, DATA)
+
+  t.plan(10)
 
   t.is(buffer.length * 8, 256, 'hmac sha256 size is equal to sha256 hash size of 256 bits')
   t.is(buffer.toString('base64'), SHA256_HMAC, 'same hmac')
@@ -187,6 +189,4 @@ test('hmac.sha256', async t => {
 
     t.is(await hmac.sha256(LARGE_PASSWORD, LARGE_DATA), buffer, 'same hmac')
   }
-
-  t.end()
 })

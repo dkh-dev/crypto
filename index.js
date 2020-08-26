@@ -4,8 +4,8 @@ const aes256 = require('./lib/aes256')
 const box = require('./lib/box')
 const hash = require('./lib/hash')
 const hmac = require('./lib/hmac')
-const randomBytes = require('./lib/random-bytes')
 const scrypt = require('./lib/scrypt')
+const { randomBytes } = require('./lib/crypto')
 
 
 module.exports = {
@@ -13,6 +13,6 @@ module.exports = {
   box,
   hash,
   hmac,
-  randomBytes,
   scrypt,
+  randomBytes,
 }
