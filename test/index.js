@@ -1,6 +1,6 @@
 'use strict'
 
-const fs = require('fs')
+const { readFileSync, createReadStream } = require('fs')
 
 const test = require('./utils/tape')
 
@@ -18,11 +18,14 @@ const INVALID_DATA = DATA.toUpperCase()
 const INVALID_PASSWORD = PASSWORD.toUpperCase()
 const AAD = 'aad'
 const INVALID_AAD = 'invalid-aad'
+// image from: https://www.flaticon.com/free-icon/kitty_763789?term=cat&page=1&position=31
+const FILE_READ_STREAM = createReadStream(`${ __dirname }/kitty.png`)
+const FILE_SHA256_HASH = Buffer.from(`AA9B54BF0670991E68939493E1C7F6EC85788D1DEABDF1A35890E8A32157DDF0`, 'hex')
 
 
 test('box', async t => {
-  const privateKey = box.createPrivateKey(fs.readFileSync(`${ __dirname }/key.pem`))
-  const publicKey = box.createPublicKey(fs.readFileSync(`${ __dirname }/key.pub`))
+  const privateKey = box.createPrivateKey(readFileSync(`${ __dirname }/key.pem`))
+  const publicKey = box.createPublicKey(readFileSync(`${ __dirname }/key.pub`))
 
   const encrypted = await box.seal(publicKey, DATA)
   const decrypted = await box.open(privateKey, encrypted)
@@ -156,13 +159,15 @@ test('randomBytes', async t => {
 test('hash.sha256', async t => {
   const buffer = await hash.sha256(DATA)
 
-  t.plan(5)
+  t.plan(6)
 
   t.is(buffer.length * 8, 256, 'sha256 hash size is 256 bits')
   t.is(buffer.toString('base64'), SHA256_HASH, 'same hash')
 
   t.is(await hash.sha256(DATA), buffer, 'same hash for same data')
   t.not(await hash.sha256(INVALID_DATA), buffer, 'invalid data')
+
+  t.is(await hash.sha256(FILE_READ_STREAM), FILE_SHA256_HASH)
 
   t.resolves(hash.sha256(LARGE_DATA), 'hash large data')
 })
