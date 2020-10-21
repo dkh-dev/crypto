@@ -13,8 +13,8 @@ const tape = (name, callback) => test(name, t => {
       await fn()
 
       t.fail(msg)
-    } catch (error) {
-      t.pass(msg)
+    } catch ({ message }) {
+      t.pass(`${ msg } ${ message }`)
     }
   }
 

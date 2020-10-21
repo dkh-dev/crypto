@@ -1,6 +1,7 @@
 'use strict'
 
 const { readFileSync, createReadStream } = require('fs')
+const { createPrivateKey, createPublicKey } = require('crypto')
 
 const test = require('./utils/tape')
 
@@ -24,8 +25,8 @@ const FILE_SHA256_HASH = Buffer.from(`AA9B54BF0670991E68939493E1C7F6EC85788D1DEA
 
 
 test('box', async t => {
-  const privateKey = box.createPrivateKey(readFileSync(`${ __dirname }/key.pem`))
-  const publicKey = box.createPublicKey(readFileSync(`${ __dirname }/key.pub`))
+  const privateKey = createPrivateKey(readFileSync(`${ __dirname }/key.pem`))
+  const publicKey = createPublicKey(readFileSync(`${ __dirname }/key.pub`))
 
   const encrypted = await box.seal(publicKey, DATA)
   const decrypted = await box.open(privateKey, encrypted)
@@ -57,6 +58,37 @@ test('box', async t => {
     t.is(decrypted.toString(), DATA, 'seal a box with aad')
 
     t.rejects(box.open(privateKey, encrypted, INVALID_AAD), 'invalid box aad')
+  }
+})
+
+test('secret box', async t => {
+  const encrypted = await aes256.encrypt(PASSWORD, DATA)
+  const decrypted = await aes256.decrypt(PASSWORD, encrypted)
+
+  t.plan(9)
+
+  t.is(decrypted.toString(), DATA, 'the decrypted string equals to the input data')
+
+  t.resolves(aes256.encrypt(PASSWORD, LARGE_DATA), 'large data')
+  t.resolves(aes256.encrypt(LARGE_PASSWORD, DATA), 'large password')
+  t.resolves(aes256.decrypt(PASSWORD, encrypted), 'encrypted data must be of type Buffer')
+  t.rejects(aes256.encrypt(PASSWORD), 'data must not be empty')
+  t.rejects(aes256.encrypt(null, DATA), 'password must not be empty')
+
+  {
+    const encrypted = await aes256.encrypt(LARGE_PASSWORD, LARGE_DATA)
+    const decrypted = await aes256.decrypt(LARGE_PASSWORD, encrypted)
+
+    t.is(decrypted.toString() === LARGE_DATA, true, 'decrypted large data')
+  }
+
+  {
+    const encrypted = await aes256.encrypt(PASSWORD, DATA, AAD)
+    const decrypted = await aes256.decrypt(PASSWORD, encrypted, AAD)
+
+    t.is(decrypted.toString() === DATA, true, 'encryption and decryption with aad')
+
+    t.rejects(aes256.decrypt(PASSWORD, encrypted, INVALID_AAD), 'invalid aad')
   }
 })
 

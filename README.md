@@ -1,4 +1,4 @@
-# crypto
+# [@dkh-dev/crypto](https://www.npmjs.com/package/@dkh-dev/crypto)
 
 _A crypto library that is easy to use and hard to misuse_
 
