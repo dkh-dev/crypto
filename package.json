@@ -12,7 +12,8 @@
     "prepublishOnly": "npm test"
   },
   "devDependencies": {
-    "@dkh-dev/eslint-config": "^1.6.0",
+    "@dkh-dev/eslint-config": "^1.6.2",
+    "@dkh-dev/tape-helper": "^1.0.4",
     "tape": "^5.0.1"
   },
   "repository": {
